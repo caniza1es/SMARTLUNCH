@@ -17,7 +17,7 @@ SmartLunch es una aplicación Flask para gestionar pedidos de comida. Esta guía
 2. **Activar el Entorno Virtual:**
 - En Windows:
   ```
-  \SmartLunch\Scripts\activate
+  SmartLunch\Scripts\activate
   ```
 - En sistemas Unix/MacOS:
   ```
