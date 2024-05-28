@@ -1,38 +1,48 @@
-"""
-Definición de la clase Usuario.
+import psycopg2
 
-Este módulo contiene la definición de la clase Usuario utilizada para representar a los usuarios en el sistema.
-"""
+class Usuarios:
+    def __init__(self):
+        self.connection = psycopg2.connect(
+            host='localhost',
+            user='postgres',
+            password='123456789',
+            database='Proyecto_ADDS'
+        )
 
-class Usuario:
-    """
-    Clase para representar a un usuario.
+    def agregar_usuario(self, nombre, usuario, contrasena, email):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("INSERT INTO Usuario (nombre, usuario, contraseña, email) VALUES (%s, %s, %s, %s)",
+                           (nombre, usuario, contrasena, email))
+            self.connection.commit()
+        finally:
+            cursor.close()
 
-    Atributos:
-        nombre (str): Nombre del usuario.
-        usuario (str): Nombre de usuario.
-        contraseña (str): Contraseña del usuario.
-        email (str): Correo electrónico del usuario.
-    """
-    def __init__(self, nombre, usuario, contraseña, email):
-        """
-        Constructor de la clase Usuario.
+    def borrar_usuario(self, usuario, contrasena):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("DELETE FROM Usuario WHERE usuario = %s AND contraseña = %s", (usuario, contrasena))
+            self.connection.commit()
+        finally:
+            cursor.close()
 
-        :param nombre: Nombre del usuario.
-        :type nombre: str
-        :param usuario: Nombre de usuario.
-        :type usuario: str
-        :param contraseña: Contraseña del usuario.
-        :type contraseña: str
-        :param email: Correo electrónico del usuario.
-        :type email: str
-        """
-        self.nombre = nombre
-        self.usuario = usuario
-        self.contraseña = contraseña
-        self.email = email
+    def actualizar_usuario(self, usuario, nombre, nuevo_usuario, nueva_contrasena, nuevo_email):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("UPDATE Usuario SET nombre = %s, usuario = %s, contraseña = %s, email = %s WHERE usuario = %s",
+                           (nombre, nuevo_usuario, nueva_contrasena, nuevo_email, usuario))
+            self.connection.commit()
+        finally:
+            cursor.close()
 
-# Lista de usuarios de ejemplo
-usuarios = [
-    Usuario("Ejemplo Usuario", "ejemplo", "123456", "ejemplo@example.com")
-]
+    def consultar_usuario(self, usuario):
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute("SELECT * FROM Usuario WHERE usuario = %s", (usuario,))
+            user_data = cursor.fetchone()
+            return user_data
+        finally:
+            cursor.close()
+
+    def __del__(self):
+        self.connection.close()
