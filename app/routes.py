@@ -1,14 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import os
-import sys
-from usuario import *
-
-
-
+import controlador_usuario as ctrl
 
 app = Flask(__name__)
-
-usuariox= Usuarios()
 
 @app.route('/')
 def inicio_sesion():
@@ -19,13 +13,18 @@ def registro():
     if request.method == 'POST':
         nombre = request.form['nombre']
         usuario = request.form['usuario']
-        contraseña = request.form['contraseña']
+        contrasena = request.form['contrasena']
         email = request.form['email']
-       
-        # inserción en la base de datos
-        usuariox.agregar_usuario(nombre,usuario,contraseña,email)
-        
-        return redirect(url_for('inicio_sesion'))  # Redirect to the login page
+
+        print(f"Datos recibidos: {nombre}, {usuario}, {contrasena}, {email}")
+
+        try:
+            ctrl.agregar_usuario(nombre, usuario, contrasena, email)
+            print("Usuario agregado correctamente")
+        except Exception as e:
+            print(f"Error al agregar usuario: {e}")
+
+        return redirect(url_for('inicio_sesion'))
 
     return render_template('registro.html')
 
@@ -33,19 +32,38 @@ def registro():
 def iniciar_sesion():
     if request.method == 'POST':
         usuario = request.form['usuario']
-        contraseña = request.form['contraseña']
-        
-        # Simulación de autenticación en la base de datos
-        print("Usuario inició sesión:", usuario, contraseña,file=sys.stdout)
-        
-        return redirect(url_for('inicio_sesion'))  # Redirect to the login page
+        contrasena = request.form['contrasena']
+
+        print(f"Intento de inicio de sesión: {usuario}, {contrasena}")
+
+        user_data = ctrl.consultar_usuario(usuario)
+        if user_data and user_data[3] == contrasena:  # Asegúrate de que el índice sea correcto para la contraseña
+            print(f"Usuario {usuario} autenticado correctamente")
+        else:
+            print(f"Fallo en la autenticación para el usuario {usuario}")
+
+        return redirect(url_for('inicio_sesion'))
 
     return render_template('inicio_sesion.html')
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+@app.route('/actualizar', methods=['POST'])
+def actualizar():
+    if request.method == 'POST':
+        usuario = request.form['usuario']
+        nombre = request.form['nombre']
+        nuevo_usuario = request.form['nuevo_usuario']
+        nueva_contrasena = request.form['nueva_contrasena']
+        nuevo_email = request.form['nuevo_email']
+
+        print(f"Datos recibidos para actualizar: {usuario}, {nombre}, {nuevo_usuario}, {nueva_contrasena}, {nuevo_email}")
+
+        try:
+            ctrl.actualizar_usuario(usuario, nombre, nuevo_usuario, nueva_contrasena, nuevo_email)
+            print("Usuario actualizado correctamente")
+        except Exception as e:
+            print(f"Error al actualizar usuario: {e}")
+
+        return redirect(url_for('inicio_sesion'))
 
 if __name__ == "__main__":
     app.run(debug=True)
