@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, session, send_from_directory, current_app
+from flask import render_template, request, redirect, url_for, session, send_from_directory, current_app, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from models.user_model import register_user, get_user_by_username, update_user, get_user_by_email
 
@@ -20,7 +20,16 @@ def register():
              redirecciona a la página de inicio de sesión en caso de un registro exitoso.
     """
     if request.method == 'POST':
-        nombre, usuario, contrasena, email = map(request.form.get, ['nombre', 'usuario', 'contraseña', 'email'])
+        nombre = request.form.get('nombre')
+        usuario = request.form.get('usuario')
+        contrasena = request.form.get('contraseña')
+        email = request.form.get('email')
+
+
+        if len(nombre) > 30 or len(usuario) > 20 or len(contrasena) > 50 or len(email) > 50:
+            error = "Alguno de los campos excede el límite permitido."
+            return render_template('registro.html', error=error)
+
         error = register_user(nombre, usuario, contrasena, email)
         if error:
             return render_template('registro.html', error=error)
@@ -36,7 +45,14 @@ def login_user():
              redirecciona al panel de usuario en caso de un inicio de sesión exitoso.
     """
     if request.method == 'POST':
-        usuario, contrasena = map(request.form.get, ['usuario', 'contraseña'])
+        usuario = request.form.get('usuario')
+        contrasena = request.form.get('contraseña')
+
+
+        if len(usuario) > 20 or len(contrasena) > 50:
+            error = "Usuario o contraseña exceden el límite permitido."
+            return render_template('inicio_sesion.html', error=error)
+
         user = get_user_by_username(usuario)
         if user and check_password_hash(user[3], contrasena):
             session['usuario'] = usuario
@@ -74,10 +90,18 @@ def user_panel(usuario):
     error = None
 
     if request.method == 'POST':
-        nombre, contraseña_actual, contraseña_nueva, email = map(request.form.get, ['nombre', 'contraseña_actual', 'contraseña_nueva', 'email'])
+        nombre = request.form.get('nombre')
+        contraseña_actual = request.form.get('contraseña_actual')
+        contraseña_nueva = request.form.get('contraseña_nueva')
+        email = request.form.get('email')
+
+        if len(nombre) > 30 or len(contraseña_actual) > 50 or len(contraseña_nueva) > 50 or len(email) > 50:
+            error = "Alguno de los campos excede el límite permitido."
+
+
         if not check_password_hash(user[3], contraseña_actual):
             error = 'La contraseña actual no es correcta'
-        if email != user[4]:  
+        if email != user[4]:
             existing_user = get_user_by_email(email)
             if existing_user:
                 error = 'El correo electrónico ya está en uso'
@@ -96,7 +120,6 @@ def user_panel(usuario):
         return render_template('panel_usuario.html', usuario=user_dict, error=error)
 
     return "Usuario no encontrado", 404
-
 
 def favicon():
     """
