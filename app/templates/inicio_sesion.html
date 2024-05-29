@@ -5,19 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <title>Iniciar Sesión</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FDF5E6; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            margin-top: 20px; /* Agregamos un margen superior */
+        }
+        h1 {
+            color: #DAA520; 
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: auto;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #DAA520; 
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #B8860B; 
+        }
+        p {
+            text-align: center;
+        }
+        a {
+            color: #DAA520; 
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .image-container {
+            margin-bottom: 20px; 
+        }
+    </style>
 </head>
 <body>
-    {% if error %}
-    <p style="color: red;">{{ error }}</p>
-    {% endif %}
-    <h1>Iniciar Sesión</h1>
-    <form method="POST" action="/inicio_sesion">
-        <label for="usuario">Usuario:</label><br>
-        <input type="text" id="usuario" name="usuario" required><br>
-        <label for="contraseña">Contraseña:</label><br>
-        <input type="password" id="contraseña" name="contraseña" required><br><br>
-        <input type="submit" value="Iniciar Sesión">
-    </form>
-    <p>No tienes una cuenta? <a href="/registro">Regístrate aquí</a>.</p>
+    <div class="container">
+        <div class="image-container">
+            <img src="../../static/monterosso.png" alt="Monterosso">
+        </div>
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <h1>Iniciar Sesión</h1>
+        <form method="POST" action="/inicio_sesion">
+            <label for="usuario">Usuario:</label><br>
+            <input type="text" id="usuario" name="usuario" required><br>
+            <label for="contraseña">Contraseña:</label><br>
+            <input type="password" id="contraseña" name="contraseña" required><br><br>
+            <input type="submit" value="Iniciar Sesión">
+        </form>
+        <p>No tienes una cuenta? <a href="/registro">Regístrate aquí</a>.</p>
+    </div>
 </body>
 </html>

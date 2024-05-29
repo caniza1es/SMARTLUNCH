@@ -1,9 +1,13 @@
 from flask import Flask
-from controllers.user_controller import login, register, login_user, logout, user_panel, favicon
+from controllers.user_controller import login, register, login_user, logout, user_panel, favicon,send_from_directory
 from config import SECRET_KEY
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static', path)
 
 #reglas de URL para las diferentes vistas
 app.add_url_rule('/', 'login', login)
