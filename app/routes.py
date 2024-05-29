@@ -1,8 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-import os
-import controlador_usuario as ctrl
-
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash 
+from controlador_usuario import *
 app = Flask(__name__)
+
+# Simulación de datos de usuario almacenados en una lista
+usuarios = [
+    {"nombre": "Ejemplo Usuario", "usuario": "ejemplo", "contraseña": "123456", "email": "ejemplo@example.com"}
+]
+
 
 @app.route('/')
 def inicio_sesion():
@@ -13,18 +17,15 @@ def registro():
     if request.method == 'POST':
         nombre = request.form['nombre']
         usuario = request.form['usuario']
-        contrasena = request.form['contrasena']
+        contraseña = request.form['contraseña']
         email = request.form['email']
 
-        print(f"Datos recibidos: {nombre}, {usuario}, {contrasena}, {email}")
 
-        try:
-            ctrl.agregar_usuario(nombre, usuario, contrasena, email)
-            print("Usuario agregado correctamente")
-        except Exception as e:
-            print(f"Error al agregar usuario: {e}")
-
-        return redirect(url_for('inicio_sesion'))
+        usuariox.agregar_usuario(nombre,usuario,contraseña,email)
+        #  inserción en la base de usuarios
+        
+        
+        return redirect(url_for('inicio_sesion'))  # Redirige a la página de inicio de sesión
 
     return render_template('registro.html')
 
@@ -32,38 +33,43 @@ def registro():
 def iniciar_sesion():
     if request.method == 'POST':
         usuario = request.form['usuario']
-        contrasena = request.form['contrasena']
-
-        print(f"Intento de inicio de sesión: {usuario}, {contrasena}")
-
-        user_data = ctrl.consultar_usuario(usuario)
-        if user_data and user_data[3] == contrasena:  # Asegúrate de que el índice sea correcto para la contraseña
-            print(f"Usuario {usuario} autenticado correctamente")
+        contraseña = request.form['contraseña']
+        
+                # Consulta el usuario en la base de datos
+        user_data = usuariox.consultar_usuario(usuario)
+        
+        if user_data[2] == usuario and user_data[3] == contraseña:
+            # Autenticación exitosa
+            return redirect(url_for('panel_usuario', usuario=usuario))
         else:
-            print(f"Fallo en la autenticación para el usuario {usuario}")
+            flash("Usuario o contraseña incorrectos", "error")
+            return redirect(url_for('inicio_sesion'))
+    
 
-        return redirect(url_for('inicio_sesion'))
 
-    return render_template('inicio_sesion.html')
 
-@app.route('/actualizar', methods=['POST'])
-def actualizar():
+@app.route('/panel_usuario/<usuario>', methods=['GET', 'POST'])
+def panel_usuario(usuario):
+    user = None
+    # Busca el usuario en la lista de usuarios
+    for u in usuarios:
+        if u["usuario"] == usuario:
+            user = u
+            break
+    
     if request.method == 'POST':
-        usuario = request.form['usuario']
-        nombre = request.form['nombre']
-        nuevo_usuario = request.form['nuevo_usuario']
-        nueva_contrasena = request.form['nueva_contrasena']
-        nuevo_email = request.form['nuevo_email']
+        # Actualiza los datos del usuario
+        user["nombre"] = request.form['nombre']
+        user["contraseña"] = request.form['contraseña']
+        user["email"] = request.form['email']
+        
+        return redirect(url_for('panel_usuario', usuario=usuario))  # Redirige de nuevo al panel de usuario
 
-        print(f"Datos recibidos para actualizar: {usuario}, {nombre}, {nuevo_usuario}, {nueva_contrasena}, {nuevo_email}")
+    return render_template('panel_usuario.html', usuario=user)
 
-        try:
-            ctrl.actualizar_usuario(usuario, nombre, nuevo_usuario, nueva_contrasena, nuevo_email)
-            print("Usuario actualizado correctamente")
-        except Exception as e:
-            print(f"Error al actualizar usuario: {e}")
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(app.static_folder, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-        return redirect(url_for('inicio_sesion'))
-
-if __name__ == "__main__":
+if __name__ == "_main_":
     app.run(debug=True)

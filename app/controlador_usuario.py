@@ -22,3 +22,5 @@ def actualizar_usuario(usuario, nombre, nuevo_usuario, nueva_contrasena, nuevo_e
         print("Usuario actualizado correctamente")
     except Exception as e:
         print(f"Error al actualizar usuario: {e}")
+
+

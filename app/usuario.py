@@ -33,6 +33,7 @@ class Usuarios:
         finally:
             cursor.close()
 
+
     def __del__(self):
         self.connection.close()
 
