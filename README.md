@@ -39,7 +39,7 @@ SmartLunch es una aplicación Flask para gestionar pedidos de comida. Esta guía
 1. **Iniciar el Servidor Flask:**
 
   ```
-  python -m flask --app .\app\routes.py run 
+  python -m flask --app .\app\app.py run 
   ```
 
 2. **Acceder a la Aplicación:**
